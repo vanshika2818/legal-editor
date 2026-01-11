@@ -1,26 +1,65 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ... existing theme variables (dark mode, etc) ... */
+
+/* --- PAGINATION STYLES --- */
+
+/* 1. The Editor Canvas (Visual Guide) */
+.ProseMirror {
+  /* Draws a guide line every 11 inches (1056px) */
+  background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 100% 1056px;
+  background-position: 0 -1px;
+  background-repeat: repeat-y;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* 2. The Page Break Node (Visual) */
+div[data-type="page-break"] {
+  @apply my-8 h-4 bg-gray-100 relative border-t border-b border-gray-300;
+  
+  /* Label */
+  &::after {
+    content: "Page Break";
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs text-gray-400 font-mono uppercase bg-gray-100 px-2;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* 3. Print Styles (Physical) */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Only show the editor content */
+  .ProseMirror, .ProseMirror * {
+    visibility: visible;
+  }
+  
+  /* Reset positioning for print */
+  .ProseMirror {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important; /* Removes the guide lines */
+  }
+
+  /* Force new page */
+  div[data-type="page-break"] {
+    break-after: always;
+    page-break-after: always;
+    height: 0;
+    margin: 0;
+    border: none;
+  }
+  
+  div[data-type="page-break"]::after {
+    display: none;
+  }
 }
